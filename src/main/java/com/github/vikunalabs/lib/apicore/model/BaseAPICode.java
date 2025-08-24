@@ -1,4 +1,4 @@
-package com.vikunalabs.lib.apicore.model;
+package com.github.vikunalabs.lib.apicore.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
