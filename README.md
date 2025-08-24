@@ -1,6 +1,3 @@
-# ✅ **Revised README.md**
-
-```markdown
 # API Response Standardization Library
 
 A lightweight Java library for standardizing REST API responses across projects with comprehensive builder support.
