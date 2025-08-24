@@ -1,4 +1,4 @@
-package com.vikunalabs.lib.apicore.model;
+package com.github.vikunalabs.lib.apicore.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * <li>'error' contains error details for failed requests (status 4xx/5xx)
  * </ul>
  *
- * @param <T> the type of the response data
+ * @param <T> the desired response type (used for type safety in generic contexts)
  * @param status HTTP status code
  * @param data response payload data (null for error responses)
  * @param error error details (null for success responses)
@@ -91,11 +91,12 @@ public record APIResponse<T>(
      * Create a success response with data and default message from APICode
      * Note: For HTTP 204 No Content, use framework-specific methods instead
      *
-     * @param <T> the type of the response data
+     * @param <T> the desired response type (used for type safety in generic contexts)
      * @param data the response data
-     * @param code the API code
-     * @return a success APIResponse
+     * @param code the API code defining the HTTP status
+     * @return a typed success APIResponse with the specified generic type
      */
+    @SuppressWarnings("unchecked")
     public static <T> APIResponse<T> success(T data, APICode code) {
         validateSuccessState(code.getHttpStatus());
         return new APIResponse<>(code.getHttpStatus(), data, null, getDefaultMessage(code), Instant.now());
@@ -105,12 +106,13 @@ public record APIResponse<T>(
      * Create a success response with data and custom message
      * Note: For HTTP 204 No Content, use framework-specific methods instead
      *
-     * @param <T> the type of the response data
+     * @param <T> the desired response type (used for type safety in generic contexts)
      * @param data the response data
-     * @param code the API code
+     * @param code the API code defining the HTTP status
      * @param message custom success message
-     * @return a success APIResponse
+     * @return a typed success APIResponse with the specified generic type
      */
+    @SuppressWarnings("unchecked")
     public static <T> APIResponse<T> success(T data, APICode code, String message) {
         validateSuccessState(code.getHttpStatus());
         return new APIResponse<>(code.getHttpStatus(), data, null, message, Instant.now());
@@ -121,11 +123,12 @@ public record APIResponse<T>(
     /**
      * Create an error response with APIError and default message from APICode
      *
-     * @param <T> the type of the response data
-     * @param error the API error
-     * @param code the API code
-     * @return an error APIResponse
+     * @param <T> the desired response type (used for type safety in generic contexts)
+     * @param error the API error details
+     * @param code the API code defining the HTTP status
+     * @return a typed error APIResponse with the specified generic type
      */
+    @SuppressWarnings("unchecked")
     public static <T> APIResponse<T> error(APIError error, APICode code) {
         validateErrorState(code.getHttpStatus());
         return new APIResponse<>(code.getHttpStatus(), null, error, getDefaultMessage(code), Instant.now());
@@ -134,12 +137,13 @@ public record APIResponse<T>(
     /**
      * Create an error response with APIError and custom message
      *
-     * @param <T> the type of the response data
-     * @param error the API error
-     * @param code the API code
+     * @param <T> the desired response type (used for type safety in generic contexts)
+     * @param error the API error details
+     * @param code the API code defining the HTTP status
      * @param message custom error message
-     * @return an error APIResponse
+     * @return a typed error APIResponse with the specified generic type
      */
+    @SuppressWarnings("unchecked")
     public static <T> APIResponse<T> error(APIError error, APICode code, String message) {
         validateErrorState(code.getHttpStatus());
         return new APIResponse<>(code.getHttpStatus(), null, error, message, Instant.now());
@@ -168,7 +172,7 @@ public record APIResponse<T>(
     /**
      * Creates a new builder instance for constructing APIResponse objects.
      *
-     * @param <T> the type of the response data
+     * @param <T> the desired response type (used for type safety in generic contexts)
      * @return a new Builder instance
      */
     public static <T> Builder<T> builder() {
@@ -176,9 +180,25 @@ public record APIResponse<T>(
     }
 
     /**
+     * Creates a new builder instance pre-populated with data.
+     * This is a type-safe alternative that infers the generic type from the data parameter.
+     *
+     * <p>Usage: {@code APIResponse.withData(myObject).status(...).build()}</p>
+     *
+     * @param <T> the type of the data (inferred automatically)
+     * @param data the response data
+     * @return a new Builder instance with data already set and correct generic type
+     */
+    public static <T> Builder<T> withData(T data) {
+        Builder<T> builder = new Builder<>();
+        builder.data = data;
+        return builder;
+    }
+
+    /**
      * Builder class for constructing APIResponse instances with validation.
      *
-     * @param <T> the type of the response data
+     * @param <T> the desired response type (used for type safety in generic contexts)
      */
     public static class Builder<T> {
         private int status;
@@ -206,7 +226,7 @@ public record APIResponse<T>(
         /**
          * Sets the status from an APICode and auto-fills message if not set.
          *
-         * @param code the API code
+         * @param code the API code defining the HTTP status
          * @return this builder instance
          */
         public Builder<T> status(APICode code) {
@@ -225,20 +245,28 @@ public record APIResponse<T>(
 
         /**
          * Sets the response data (clears error).
+         * This method infers the correct generic type from the data parameter.
          *
+         * <p><strong>Type Safety Note:</strong> This method uses type erasure and casting
+         * to provide better API ergonomics. It's safe when used in the typical builder
+         * pattern: {@code APIResponse.builder().data(myData).status(...).build()}</p>
+         *
+         * @param <U> the type of the data
          * @param data the response data
-         * @return this builder instance
+         * @return a properly typed builder instance
+         * @throws ClassCastException if this builder was previously configured with incompatible types
          */
-        public Builder<T> data(T data) {
-            this.data = data;
+        @SuppressWarnings("unchecked")
+        public <U> Builder<U> data(U data) {
+            this.data = (T) data;
             this.error = null;
-            return this;
+            return (Builder<U>) this;
         }
 
         /**
          * Sets the error (clears data).
          *
-         * @param error the API error
+         * @param error the API error details
          * @return this builder instance
          */
         public Builder<T> error(APIError error) {
@@ -273,7 +301,9 @@ public record APIResponse<T>(
          * Builds the APIResponse instance with validation.
          *
          * @return the constructed APIResponse
+         * @throws IllegalArgumentException if message is null or status is 204
          */
+        @SuppressWarnings("unchecked")
         public APIResponse<T> build() {
             if (message == null) {
                 throw new IllegalArgumentException("Message is required");
