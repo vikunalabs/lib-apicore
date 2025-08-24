@@ -1,4 +1,4 @@
-package com.github.vikunalabs.lib.apicore.model;
+package com.vikunalabs.lib.apicore.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
