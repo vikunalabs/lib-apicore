@@ -1,12 +1,9 @@
 package com.github.vikunalabs.lib.apicore.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * Interface defining standard API response codes with HTTP status mapping.
  * Implementations provide consistent error and success codes across the API.
  */
-@Schema(description = "API response code interface defining standard codes with HTTP status mapping")
 public interface APICode {
     /**
      * Returns the name of this API code.

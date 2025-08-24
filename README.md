@@ -5,7 +5,6 @@ A lightweight Java library for standardizing REST API responses across projects 
 ## ✨ Features
 
 - ✅ Standardized success/error response format
-- ✅ OpenAPI/Swagger documentation support  
 - ✅ HTTP status code validation (blocks HTTP 204)
 - ✅ Type-safe generic responses
 - ✅ Jackson serialization support
@@ -18,7 +17,7 @@ A lightweight Java library for standardizing REST API responses across projects 
 ### Installation
 
 ```gradle
-implementation 'com.yourcompany:api-response-library:x.x.x'
+implementation 'com.github.vikunlabs:lib-apicore:x.x.x'
 ```
 
 Always look for the latest version of this library here - [JitPack](https://jitpack.io/#vikunalabs/lib-apicore)

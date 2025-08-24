@@ -2,7 +2,6 @@ package com.github.vikunalabs.lib.apicore.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,23 +25,9 @@ import java.util.List;
  * @param fieldErrors List of field-specific errors (optional)
  * @param details Additional debug information (optional)
  */
-@Schema(name = "APIError", description = "Standard error response format for API failures", type = "object")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"code", "message", "fieldErrors", "details"})
-public record APIError(
-        @Schema(
-                        description = "Machine-readable error code from APICode enum",
-                        requiredMode = Schema.RequiredMode.REQUIRED)
-                String code,
-        @Schema(description = "Human-readable error message", requiredMode = Schema.RequiredMode.REQUIRED)
-                String message,
-        @Schema(
-                        description = "List of field-specific validation errors (only present for 400 errors)",
-                        nullable = true,
-                        type = "array",
-                        implementation = FieldError.class)
-                List<FieldError> fieldErrors,
-        @Schema(description = "Additional debug information", nullable = true) String details) {
+public record APIError(String code, String message, List<FieldError> fieldErrors, String details) {
 
     /**
      * Constructor for simple errors without field errors or details.
