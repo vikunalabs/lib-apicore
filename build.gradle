@@ -1,0 +1,82 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'  // Required for JitPack
+    id 'com.diffplug.spotless' version '7.1.0'
+}
+
+group = 'com.github.vikunalabs'
+version = '0.0.1'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.35'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.0'
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web:3.2.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Publishing configuration for JitPack
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            // Optional: Add POM metadata
+            pom {
+                name = 'API Response Library'
+                description = 'Standardized API response library for Java projects'
+                url = 'https://github.com/vikunalabs/libs'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Spotless
+spotless {
+    java {
+        target fileTree('src') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        toggleOffOn()
+        palantirJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+        importOrder()
+        formatAnnotations()
+    }
+}
+
+tasks.compileJava.dependsOn(spotlessApply)
+tasks.compileTestJava.dependsOn(spotlessApply)
+tasks.build.dependsOn(test, spotlessApply)
