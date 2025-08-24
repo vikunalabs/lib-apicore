@@ -2,6 +2,10 @@ package com.github.vikunalabs.lib.apicore.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.github.vikunalabs.lib.apicore.exception.base.BusinessLogicBaseException;
+import com.github.vikunalabs.lib.apicore.exception.base.ClientErrorsBaseException;
+import com.github.vikunalabs.lib.apicore.exception.base.ServerErrorsBaseException;
+import com.github.vikunalabs.lib.apicore.exception.util.ExceptionResponseMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
@@ -359,5 +363,38 @@ public record APIResponse<T>(
     @Schema(hidden = true)
     public Optional<APIError> getError() {
         return Optional.ofNullable(error);
+    }
+
+    /**
+     * Creates an APIResponse from a ClientErrorsBaseException.
+     *
+     * @param <T> the response data type
+     * @param ex the client error exception
+     * @return an APIResponse containing the error details
+     */
+    public static <T> APIResponse<T> fromException(ClientErrorsBaseException ex) {
+        return ExceptionResponseMapper.toResponse(ex);
+    }
+
+    /**
+     * Creates an APIResponse from a ServerErrorsBaseException.
+     *
+     * @param <T> the response data type
+     * @param ex the server error exception
+     * @return an APIResponse containing the error details
+     */
+    public static <T> APIResponse<T> fromException(ServerErrorsBaseException ex) {
+        return ExceptionResponseMapper.toResponse(ex);
+    }
+
+    /**
+     * Creates an APIResponse from a BusinessLogicBaseException.
+     *
+     * @param <T> the response data type
+     * @param ex the business logic exception
+     * @return an APIResponse containing the error details
+     */
+    public static <T> APIResponse<T> fromException(BusinessLogicBaseException ex) {
+        return ExceptionResponseMapper.toResponse(ex);
     }
 }

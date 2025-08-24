@@ -31,8 +31,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.38'
     annotationProcessor 'org.projectlombok:lombok:1.18.38'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-web:3.2.0'
 }
 
 tasks.named('test') {

@@ -23,6 +23,16 @@ public interface APICode {
     int getHttpStatus();
 
     /**
+     * Returns a default human-readable message for this code.
+     * Used when no specific message is provided for exceptions.
+     *
+     * @return the default message for this code
+     */
+    default String getDefaultMessage() {
+        return name().toLowerCase().replace('_', ' ');
+    }
+
+    /**
      * Get a formatted message with dynamic content
      * @param message the dynamic message content
      * @return the complete message
