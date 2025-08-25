@@ -2,7 +2,10 @@ package com.github.vikunalabs.lib.apicore.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.github.vikunalabs.lib.apicore.exception.base.BusinessLogicBaseException;
+import com.github.vikunalabs.lib.apicore.exception.base.ClientErrorsBaseException;
+import com.github.vikunalabs.lib.apicore.exception.base.ServerErrorsBaseException;
+import com.github.vikunalabs.lib.apicore.exception.util.ExceptionResponseMapper;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -24,40 +27,9 @@ import java.util.Optional;
  * @param message human-readable status message
  * @param timestamp timestamp of response in ISO-8601 format
  */
-@Schema(
-        name = "APIResponse",
-        description =
-                """
-                    Standard API response wrapper for all endpoints.
-
-                    Note: Exactly one of 'data' or 'error' will be present:
-                    - 'data' contains the response payload for successful requests (status 2xx)
-                    - 'error' contains error details for failed requests (status 4xx/5xx)
-                """,
-        type = "object")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"status", "data", "error", "message", "timestamp"})
-public record APIResponse<T>(
-        @Schema(
-                        description = "HTTP Status Code",
-                        type = "integer",
-                        format = "int32",
-                        requiredMode = Schema.RequiredMode.REQUIRED)
-                int status,
-        @Schema(description = "Response payload data", nullable = true) T data,
-        @Schema(description = "Error details if request failed", nullable = true, implementation = APIError.class)
-                APIError error,
-        @Schema(
-                        description = "Human-readable status message",
-                        requiredMode = Schema.RequiredMode.REQUIRED,
-                        type = "string")
-                String message,
-        @Schema(
-                        description = "Timestamp of response in ISO-8601 format",
-                        type = "string",
-                        format = "date-time",
-                        requiredMode = Schema.RequiredMode.REQUIRED)
-                Instant timestamp)
+public record APIResponse<T>(int status, T data, APIError error, String message, Instant timestamp)
         implements Serializable {
 
     /**
@@ -346,7 +318,6 @@ public record APIResponse<T>(
      *
      * @return Optional containing the data, or empty if no data
      */
-    @Schema(hidden = true)
     public Optional<T> getData() {
         return Optional.ofNullable(data);
     }
@@ -356,8 +327,40 @@ public record APIResponse<T>(
      *
      * @return Optional containing the error, or empty if no error
      */
-    @Schema(hidden = true)
     public Optional<APIError> getError() {
         return Optional.ofNullable(error);
+    }
+
+    /**
+     * Creates an APIResponse from a ClientErrorsBaseException.
+     *
+     * @param <T> the response data type
+     * @param ex the client error exception
+     * @return an APIResponse containing the error details
+     */
+    public static <T> APIResponse<T> fromException(ClientErrorsBaseException ex) {
+        return ExceptionResponseMapper.toResponse(ex);
+    }
+
+    /**
+     * Creates an APIResponse from a ServerErrorsBaseException.
+     *
+     * @param <T> the response data type
+     * @param ex the server error exception
+     * @return an APIResponse containing the error details
+     */
+    public static <T> APIResponse<T> fromException(ServerErrorsBaseException ex) {
+        return ExceptionResponseMapper.toResponse(ex);
+    }
+
+    /**
+     * Creates an APIResponse from a BusinessLogicBaseException.
+     *
+     * @param <T> the response data type
+     * @param ex the business logic exception
+     * @return an APIResponse containing the error details
+     */
+    public static <T> APIResponse<T> fromException(BusinessLogicBaseException ex) {
+        return ExceptionResponseMapper.toResponse(ex);
     }
 }

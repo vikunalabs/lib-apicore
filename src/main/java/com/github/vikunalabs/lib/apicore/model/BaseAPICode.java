@@ -1,6 +1,5 @@
 package com.github.vikunalabs.lib.apicore.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 /**
@@ -8,148 +7,173 @@ import lombok.Getter;
  * Messages are passed dynamically.
  */
 @Getter
-@Schema(description = "Standardized API response codes with HTTP status", enumAsRef = true)
 public enum BaseAPICode implements APICode {
     // ========== SUCCESS CODES (2xx) ==========
-    @Schema(description = "Generic success response")
+    /** Generic success response */
     SUCCESS(200),
 
-    @Schema(description = "Resource created successfully")
+    /** Resource created successfully */
     RESOURCE_CREATED(201),
 
-    @Schema(description = "Resource updated successfully")
+    /** Resource updated successfully */
     RESOURCE_UPDATED(200),
 
-    @Schema(description = "Resource deleted successfully")
+    /** Resource deleted successfully */
     RESOURCE_DELETED(200),
 
-    @Schema(description = "Operation accepted for processing")
+    /** Operation accepted for processing */
     REQUEST_ACCEPTED(202),
 
     // ========== USER DOMAIN CODES ==========
-    @Schema(description = "User operation successful")
+    /** User operation successful */
     USER_SUCCESS(200),
 
-    @Schema(description = "User created successfully")
+    /** User created successfully */
     USER_CREATED(201),
 
-    @Schema(description = "User not found")
+    /** User not found */
     USER_NOT_FOUND(404),
 
-    @Schema(description = "User already exists")
+    /** User already exists */
     USER_ALREADY_EXISTS(409),
 
-    @Schema(description = "User account issue")
+    /** User account issue */
     USER_ACCOUNT_ISSUE(403),
 
     // ========== VALIDATION ERRORS (4xx) ==========
 
-    @Schema(description = "Bad request")
+    // Client Errors - Additional specific codes
+    /** Authentication failed */
+    AUTHENTICATION_FAILED(401),
+
+    /** Authorization failed - insufficient permissions */
+    AUTHORIZATION_FAILED(403),
+
+    /** Concurrent modification detected */
+    CONCURRENT_MODIFICATION(409),
+
+    /** Resource version conflict */
+    VERSION_CONFLICT(409),
+
+    // Business Logic Errors
+    /** Business rule violation */
+    BUSINESS_RULE_VIOLATION(400),
+
+    /** Invalid resource state for operation */
+    INVALID_STATE(400),
+
+    /** Operation not allowed */
+    OPERATION_NOT_ALLOWED(403),
+
+    /** Quota or limit exceeded */
+    QUOTA_EXCEEDED(429),
+
+    /** Domain validation failed */
+    DOMAIN_VALIDATION_FAILED(400),
+
+    /** Bad request */
     BAD_REQUEST(400),
 
-    @Schema(description = "Request parameter validation failed")
+    /** Request parameter validation failed */
     VALIDATION_FAILED(400),
 
-    @Schema(description = "Invalid parameter")
+    /** Invalid parameter */
     INVALID_PARAMETER(400),
 
-    @Schema(description = "Malformed request")
+    /** Malformed request */
     MALFORMED_REQUEST(400),
 
-    @Schema(description = "Missing parameter")
+    /** Missing parameter */
     MISSING_PARAMETER(400),
 
-    @Schema(description = "Type mismatch")
+    /** Type mismatch */
     TYPE_MISMATCH(400),
 
-    @Schema(description = "Invalid input format")
+    /** Invalid input format */
     INVALID_INPUT(400),
 
-    @Schema(description = "Missing field")
+    /** Missing field */
     MISSING_FIELD(400),
 
-    @Schema(description = "Field length issue")
+    /** Field length issue */
     FIELD_LENGTH_ISSUE(400),
 
-    @Schema(description = "Invalid format")
+    /** Invalid format */
     INVALID_FORMAT(400),
 
-    @Schema(description = "Value out of range")
+    /** Value out of range */
     OUT_OF_RANGE(400),
 
     // ========== BUSINESS ERRORS (4xx) ==========
-    @Schema(description = "Resource not found")
+    /** Resource not found */
     RESOURCE_NOT_FOUND(404),
 
-    @Schema(description = "Resource already exists")
+    /** Resource already exists */
     RESOURCE_EXISTS(409),
 
-    @Schema(description = "Resource conflict")
+    /** Resource conflict */
     RESOURCE_CONFLICT(409),
 
-    @Schema(description = "Operation not allowed")
-    OPERATION_NOT_ALLOWED(403),
-
-    @Schema(description = "Account disabled")
+    /** Account disabled */
     ACCOUNT_DISABLED(403),
 
-    @Schema(description = "Account locked")
+    /** Account locked */
     ACCOUNT_LOCKED(403),
 
-    @Schema(description = "No action taken or request not processable")
+    /** No action taken or request not processable */
     NO_ACTION_TAKEN(400),
 
-    @Schema(description = "Request not processable")
+    /** Request not processable */
     REQUEST_NOT_PROCESSABLE(400),
 
-    @Schema(description = "Quota exceeded")
-    QUOTA_EXCEEDED(429),
-
-    @Schema(description = "Business rule violation")
-    BUSINESS_RULE_VIOLATION(400),
-
     // ========== AUTHENTICATION (4xx) ==========
-    @Schema(description = "Authentication required")
+    /** Authentication required */
     UNAUTHENTICATED(401),
 
-    @Schema(description = "Invalid credentials")
+    /** Invalid credentials */
     INVALID_CREDENTIALS(401),
 
-    @Schema(description = "Account issue")
+    /** Account issue */
     ACCOUNT_ISSUE(403),
 
     // ========== AUTHORIZATION (4xx) ==========
-    @Schema(description = "Access denied")
+    /** Access denied */
     FORBIDDEN(403),
 
-    @Schema(description = "Role restriction")
+    /** Role restriction */
     ROLE_RESTRICTED(403),
 
-    @Schema(description = "Scope restriction")
+    /** Scope restriction */
     SCOPE_RESTRICTED(403),
 
     // ========== RATE LIMITING (4xx) ==========
-    @Schema(description = "Too many requests")
+    /** Too many requests */
     RATE_LIMITED(429),
 
-    @Schema(description = "Concurrent request limit")
+    /** Concurrent request limit */
     CONCURRENCY_LIMIT(429),
 
     // ========== SERVER ERRORS (5xx) ==========
-    @Schema(description = "Internal server error")
+    /** Internal server error */
     INTERNAL_ERROR(500),
 
-    @Schema(description = "Service unavailable")
-    SERVICE_UNAVAILABLE(503),
-
-    @Schema(description = "Database error")
-    DATABASE_ERROR(500),
-
-    @Schema(description = "External service failure")
+    /** External service failure */
     EXTERNAL_SERVICE_FAILURE(502),
 
-    @Schema(description = "Not implemented")
-    NOT_IMPLEMENTED(501);
+    /** Database operation failed */
+    DATABASE_ERROR(500),
+
+    /** External service timeout */
+    EXTERNAL_SERVICE_TIMEOUT(504),
+
+    /** Service temporarily unavailable */
+    SERVICE_UNAVAILABLE(503),
+
+    /** Feature not implemented */
+    NOT_IMPLEMENTED(501),
+
+    /** Gateway timeout */
+    GATEWAY_TIMEOUT(504);
 
     private final int httpStatus;
 

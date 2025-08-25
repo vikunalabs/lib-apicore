@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.github.vikunalabs'
-version = '0.0.3'
+version = '0.0.4'
 
 java {
     toolchain {
@@ -26,13 +26,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.swagger.core.v3:swagger-annotations:2.2.35'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.0'
     compileOnly 'org.projectlombok:lombok:1.18.38'
     annotationProcessor 'org.projectlombok:lombok:1.18.38'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-web:3.2.0'
 }
 
 tasks.named('test') {
