@@ -14,10 +14,16 @@ import java.util.Optional;
 /**
  * Standard API response wrapper for all endpoints.
  *
- * <p>Note: Exactly one of 'data' or 'error' will be present:
+ * <p>Note: For successful responses (status 2xx):
  * <ul>
- * <li>'data' contains the response payload for successful requests (status 2xx)
- * <li>'error' contains error details for failed requests (status 4xx/5xx)
+ * <li>'data' contains the response payload (may be null for success responses with only a message)
+ * <li>'error' is always null
+ * </ul>
+ *
+ * <p>For error responses (status 4xx/5xx):
+ * <ul>
+ * <li>'data' is always null
+ * <li>'error' contains error details (must not be null)
  * </ul>
  *
  * @param <T> the desired response type (used for type safety in generic contexts)
@@ -38,21 +44,6 @@ public record APIResponse<T>(int status, T data, APIError error, String message,
      * required fields are present.
      */
     public APIResponse {
-        /**
-         *
-         * both data and error cannot exist together
-         * */
-        if (data != null && error != null) {
-            throw new IllegalArgumentException("Both data and error cannot be non-null");
-        }
-        /*
-         *
-         * either data or error should exist, both cannot be null
-         * */
-        if (data == null && error == null) {
-            throw new IllegalArgumentException("Either data or error must be non-null");
-        }
-
         Objects.requireNonNull(message, "Message cannot be null");
         Objects.requireNonNull(timestamp, "Timestamp cannot be null");
     }
@@ -90,6 +81,31 @@ public record APIResponse<T>(int status, T data, APIError error, String message,
         return new APIResponse<>(code.getHttpStatus(), data, null, message, Instant.now());
     }
 
+    /**
+     * Create a success response with custom message, but no data and
+     * Note: For HTTP 204 No Content, use framework-specific methods instead
+     *
+     * @param code the API code defining the HTTP status
+     * @param message custom success message
+     * @return a typed success APIResponse with the specified generic type
+     */
+    public static APIResponse<Void> success(APICode code, String message) {
+        validateSuccessState(code.getHttpStatus());
+        return new APIResponse<>(code.getHttpStatus(), null, null, message, Instant.now());
+    }
+
+    /**
+     * Create a success response with default message, but no data
+     * Note: For HTTP 204 No Content, use framework-specific methods instead
+     *
+     * @param code the API code defining the HTTP status
+     * @return a typed success APIResponse with the specified generic type
+     */
+    public static APIResponse<Void> success(APICode code) {
+        validateSuccessState(code.getHttpStatus());
+        return new APIResponse<>(code.getHttpStatus(), null, null, getDefaultMessage(code), Instant.now());
+    }
+
     // ========== ERROR FACTORY METHODS ==========
 
     /**
@@ -103,6 +119,10 @@ public record APIResponse<T>(int status, T data, APIError error, String message,
     @SuppressWarnings("unchecked")
     public static <T> APIResponse<T> error(APIError error, APICode code) {
         validateErrorState(code.getHttpStatus());
+        // For error responses, data must be null and error must not be null
+        if (error == null) {
+            throw new IllegalArgumentException("Error responses must have an error");
+        }
         return new APIResponse<>(code.getHttpStatus(), null, error, getDefaultMessage(code), Instant.now());
     }
 
@@ -118,6 +138,10 @@ public record APIResponse<T>(int status, T data, APIError error, String message,
     @SuppressWarnings("unchecked")
     public static <T> APIResponse<T> error(APIError error, APICode code, String message) {
         validateErrorState(code.getHttpStatus());
+        // For error responses, data must be null and error must not be null
+        if (error == null) {
+            throw new IllegalArgumentException("Error responses must have an error");
+        }
         return new APIResponse<>(code.getHttpStatus(), null, error, message, Instant.now());
     }
 
@@ -283,6 +307,24 @@ public record APIResponse<T>(int status, T data, APIError error, String message,
 
             if (status == 204) {
                 throw new IllegalArgumentException("HTTP 204 cannot use APIResponse");
+            }
+
+            if (status >= 200 && status < 300) {
+                // Success response - error must be null
+                if (error != null) {
+                    throw new IllegalArgumentException("Success responses cannot have an error");
+                }
+                // data can be null for success responses
+            } else if (status >= 400 && status < 600) {
+                // Error response - error must not be null, data must be null
+                if (error == null) {
+                    throw new IllegalArgumentException("Error responses must have an error");
+                }
+                if (data != null) {
+                    throw new IllegalArgumentException("Error responses cannot have data");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid status code: " + status);
             }
 
             return new APIResponse<>(status, data, error, message, timestamp);

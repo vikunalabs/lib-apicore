@@ -18,6 +18,13 @@ return APIResponse.success(user, BaseAPICode.SUCCESS, "User operation completed"
 
 ### Builder Pattern
 
+**Success:**
+```java
+return APIResponse.<User>builder()
+    .status(BaseAPICode.USER_CREATED) // Auto-sets message from APICode
+    .build();
+```
+
 **Simple Success:**
 ```java
 return APIResponse.<User>builder()
