@@ -25,6 +25,9 @@ Always look for the latest version of this library here - [JitPack](https://jitp
 ### Basic Usage
 
 ```java
+// Success response (no data)
+return APIResponse.success(BaseAPICode.USER_CREATED);
+
 // Success response
 return APIResponse.success(user, BaseAPICode.USER_CREATED);
 
