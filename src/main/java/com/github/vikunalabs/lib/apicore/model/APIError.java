@@ -30,6 +30,14 @@ import java.util.List;
 public record APIError(String code, String message, List<FieldError> fieldErrors, String details) {
 
     /**
+     * Compact constructor that ensures fieldErrors is never null.
+     */
+    public APIError {
+        // Ensure fieldErrors is never null
+        fieldErrors = fieldErrors != null ? fieldErrors : List.of();
+    }
+
+    /**
      * Constructor for simple errors without field errors or details.
      *
      * @param code the error code
